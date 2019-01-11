@@ -27,6 +27,9 @@ receivers:
     # Copy all Prometheus labels into separate JIRA labels. Optional (default: false).
     add_group_labels: false
 
+    # Add a comment to in-progress issues (instead of silently ignoring them)
+    annotate_open_issues: false
+
   - name: 'jira-xy'
     project: XY
     # Overrides default.

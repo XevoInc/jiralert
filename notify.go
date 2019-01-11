@@ -50,7 +50,11 @@ func (r *Receiver) Notify(data *alertmanager.Data) (bool, error) {
 	if issue != nil {
 		// The set of JIRA status categories is fixed, this is a safe check to make.
 		if issue.Fields.Status.StatusCategory.Key != "done" {
-			// Issue is in a "to do" or "in progress" state, all done here.
+			// Issue is in a "to do" or "in progress" state.
+			if r.conf.AnnotateOpenIssues {
+				return r.annotate(issue.ID, &jira.Comment{Body: r.tmpl.Execute(r.conf.Description, data)})
+			}
+
 			log.V(1).Infof("Issue %s for %s is unresolved, nothing to do", issue.Key, issueLabel)
 			return false, nil
 		}
@@ -214,6 +218,17 @@ func (r *Receiver) create(issue *jira.Issue) (bool, error) {
 	}
 
 	log.V(1).Infof("  done: key=%s ID=%s", issue.Key, issue.ID)
+	return false, nil
+}
+
+func (r *Receiver) annotate(issueID string, comment *jira.Comment) (bool, error) {
+	log.V(1).Infof("annotate: issueID=%q comment=%#v", issueID, comment)
+	comment, resp, err := r.client.Issue.AddComment(issueID, comment)
+	if err != nil {
+		return handleJiraError("Issue.AddComment", resp, err)
+	}
+
+	log.V(1).Infof("    done: comment.ID=%q", comment.ID)
 	return false, nil
 }
 

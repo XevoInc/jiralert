@@ -97,6 +97,8 @@ type ReceiverConfig struct {
 	// Label copy settings
 	AddGroupLabels bool `yaml:"add_group_labels" json:"add_group_labels"`
 
+	AnnotateOpenIssues bool `yaml:"annotate_open_issues" json:"annotate_open_issues"`
+
 	// Catches all undefined fields and must be empty after parsing.
 	XXX map[string]interface{} `yaml:",inline" json:"-"`
 }
